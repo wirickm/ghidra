@@ -1,0 +1,16 @@
+name: mirror-ghidra
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VER: 12.1.4
+    steps:
+      - run: |
+          gh release download "Ghidra_${VER}_build" -R NationalSecurityAgency/ghidra -p "ghidra_${VER}_PUBLIC_*.zip" -D dl
+          mv dl/ghidra_${VER}_PUBLIC_*.zip "ghidra_${VER}_PUBLIC.zip"
+          sha256sum "ghidra_${VER}_PUBLIC.zip"
+          gh release create "ghidra-${VER}" "ghidra_${VER}_PUBLIC.zip" -R "$GITHUB_REPOSITORY" --title "Ghidra ${VER} mirror" --notes "Unmodified official zip from NationalSecurityAgency/ghidra release Ghidra_${VER}_build."
